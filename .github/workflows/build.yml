@@ -7,7 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: unzip -q AutoDialerPro.zip
+      - name: Unzip project
+        run: |
+          ls -la
+          unzip -q -o AutoDialerPro*.zip -d proj
+          D=$(dirname "$(find proj -name settings.gradle.kts | head -1)")
+          echo "DIR=$D" >> $GITHUB_ENV
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -17,8 +22,8 @@ jobs:
         with:
           gradle-version: 8.5
       - run: gradle assembleDebug --no-daemon
-        working-directory: AutoDialerPro
+        working-directory: ${{ env.DIR }}
       - uses: actions/upload-artifact@v4
         with:
           name: AutoDialerPro-APK
-          path: AutoDialerPro/app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ env.DIR }}/app/build/outputs/apk/debug/app-debug.apk
